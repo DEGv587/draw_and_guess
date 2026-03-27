@@ -534,6 +534,11 @@ export class GameRoom extends DurableObject<Env> {
       isNewRound: s.currentDrawerIndex === 0,
     })
 
+    // 告知画手当前词（覆盖手动选词和超时自动选词两种情况）
+    if (s.currentWord) {
+      this.sendToPlayer(this.currentDrawerId()!, { type: 'current_word', word: s.currentWord })
+    }
+
     const hintTime = s.settings.drawTime * GAME_CONSTANTS.HINT_REVEAL_RATIO * 1000
     this.ctx.storage.setAlarm(Date.now() + hintTime)
   }

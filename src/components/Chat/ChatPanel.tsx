@@ -32,9 +32,9 @@ export default function ChatPanel({ messages, isDrawer = false, onSend, classNam
   }
 
   return (
-    <div className={`flex-1 flex flex-col bg-pixel-bg ${className ?? ''}`}>
+    <div className={`flex-1 flex flex-col min-h-0 overflow-hidden ${className ?? ''}`}>
       {/* 消息列表 */}
-      <div ref={listRef} className="flex-1 overflow-y-auto p-2 space-y-1">
+      <div ref={listRef} className="flex-1 overflow-y-auto p-2 space-y-1 min-h-0">
         {messages.map((msg, i) => (
           <div key={i} className="text-xs">
             {msg.type === 'correct' ? (
@@ -56,7 +56,7 @@ export default function ChatPanel({ messages, isDrawer = false, onSend, classNam
       </div>
 
       {/* 输入框 */}
-      <form onSubmit={handleSubmit} className="p-2 border-t-2 border-pixel-border-dark">
+      <form onSubmit={handleSubmit} className="p-2 border-t-2 border-pixel-border-dark shrink-0">
         <input
           type="text"
           value={input}

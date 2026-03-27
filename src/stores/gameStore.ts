@@ -195,6 +195,11 @@ export const useGameStore = create<GameState>((set, get) => ({
         break
       }
 
+      case 'current_word': {
+        set({ currentWord: msg.word })
+        break
+      }
+
       case 'hint_update': {
         set({ hint: msg.hint })
         break

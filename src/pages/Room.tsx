@@ -1,6 +1,6 @@
 import { useState, useRef, useCallback, useEffect } from 'react'
 import { useParams, useNavigate, useLocation } from 'react-router-dom'
-import { PixelPlayerSeat } from '../components/ui/PixelSprite'
+import { PixelPlayerSeat, PixelPoop } from '../components/ui/PixelSprite'
 import { PixelFrame, PixelPanel, TileFloor } from '../components/ui/PixelScene'
 import DrawingCanvas from '../components/Canvas/DrawingCanvas'
 import type { DrawingCanvasHandle, DrawPoint } from '../components/Canvas/DrawingCanvas'
@@ -221,6 +221,20 @@ export default function Room() {
   // 移动端聊天折叠
   const [chatOpen, setChatOpen] = useState(false)
 
+  // 粑粑投掷动效
+  const [poopFlyTargetId, setPoopFlyTargetId] = useState<string | null>(null)
+  const [poopFlash, setPoopFlash] = useState(false)
+  const prevPoopCount = useRef(gameStore.myPoopCount)
+
+  // 粑粑数量减少时闪动道具栏
+  useEffect(() => {
+    if (prevPoopCount.current > gameStore.myPoopCount) {
+      setPoopFlash(true)
+      setTimeout(() => setPoopFlash(false), 600)
+    }
+    prevPoopCount.current = gameStore.myPoopCount
+  }, [gameStore.myPoopCount])
+
   useEffect(() => {
     if (gameStore.status === 'game_end' && gameStore.rankings) {
       navigate('/result', { state: { rankings: gameStore.rankings, roomId } })
@@ -244,7 +258,7 @@ export default function Room() {
 
   // ===== 游戏阶段 =====
   return (
-    <div className="h-screen flex flex-col bg-pixel-bg scanlines overflow-hidden">
+    <div className="h-dvh md:h-screen flex flex-col bg-pixel-bg scanlines overflow-y-auto md:overflow-hidden">
       {/* 选词弹窗（画手在选词阶段可见） */}
       {gameStore.status === 'choosing' && gameStore.isDrawer && (
         gameStore.wordChoices ? (
@@ -329,15 +343,16 @@ export default function Room() {
         currentRound={gameStore.currentRound || 1}
         totalRounds={gameStore.totalRounds}
         poopCount={gameStore.myPoopCount}
+        poopFlash={poopFlash}
         onExit={handleLeave}
       />
 
       {/* ===== 主体区域 ===== */}
-      <div className="flex flex-col md:flex-row flex-1 min-h-0">
+      <div className="flex flex-col md:flex-row md:flex-1 min-h-0">
 
-        {/* 左侧 - 画板区域 */}
-        <div className="flex-1 flex flex-col brick-wall min-h-0">
-          <div className="flex-1 flex items-center justify-center p-2 md:p-4 min-h-0">
+        {/* 画板区域 */}
+        <div className="md:flex-1 flex flex-col brick-wall min-h-0">
+          <div className="flex items-center justify-center p-2 md:p-4 min-h-0 h-[50vh] md:h-auto md:flex-1">
             <PixelFrame variant="wood" className="w-full h-full max-w-[800px] min-h-0 overflow-hidden">
               <DrawingCanvas
                 ref={canvasRef}
@@ -386,70 +401,145 @@ export default function Room() {
           )}
         </div>
 
-        {/* 右侧/底部 - 画手 + 聊天（移动端可折叠） */}
-        <div className={`
-          md:w-80 flex flex-col border-t-4 md:border-t-0 md:border-l-4 border-pixel-border-dark
-          ${chatOpen ? 'h-64' : 'h-10'} md:h-auto transition-[height] duration-200
-        `}>
-          {/* 移动端折叠按钮 */}
-          <button
-            className="md:hidden flex items-center justify-between px-3 py-1.5 bg-pixel-panel-dark shrink-0"
-            onClick={() => setChatOpen(!chatOpen)}
-          >
-            <DrawerDisplay
-              name={drawerName}
-              colorIndex={drawerPlayer?.color ?? 0}
-              compact
-            />
-            <span className="text-pixel-tile text-[10px]">{chatOpen ? '▼ 收起' : '▲ 聊天'}</span>
-          </button>
-          {/* 桌面端始终显示画手信息 */}
-          <div className="hidden md:block">
-            <DrawerDisplay
-              name={drawerName}
-              colorIndex={drawerPlayer?.color ?? 0}
-            />
-          </div>
+        {/* 右侧 - 仅桌面端：画手 + 聊天 */}
+        <div className="desktop-only-flex w-80 flex-col border-l-4 border-pixel-border-dark bg-pixel-bg">
+          <DrawerDisplay
+            name={drawerName}
+            colorIndex={drawerPlayer?.color ?? 0}
+          />
           <ChatPanel
             messages={gameStore.chatMessages}
             isDrawer={gameStore.isDrawer}
             onSend={handleSendMessage}
-            className={`${chatOpen ? 'flex' : 'hidden'} md:flex`}
           />
         </div>
       </div>
 
+      {/* 移动端 - 聊天浮层 */}
+      {chatOpen && (
+        <div className="mobile-only" style={{ position: 'fixed', inset: 0, zIndex: 10000 }} onClick={() => setChatOpen(false)}>
+          {/* 下方聊天区：绝对定位固定在底部 60% */}
+          <div
+            className="absolute bottom-0 left-0 right-0 backdrop-blur-md border-t-4 border-pixel-border-dark"
+            style={{ height: '60%', backgroundColor: 'rgba(22, 22, 30, 0.75)' }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* 标题栏 */}
+            <div className="flex items-center justify-between px-3 py-1.5"
+              style={{ backgroundColor: 'rgba(42, 42, 74, 0.9)' }}
+            >
+              <DrawerDisplay
+                name={drawerName}
+                colorIndex={drawerPlayer?.color ?? 0}
+                compact
+              />
+              <button onClick={() => setChatOpen(false)} className="text-pixel-tile text-[10px]">▼ 收起</button>
+            </div>
+            {/* 消息列表：绝对定位，上下夹在标题栏和输入框之间 */}
+            <div
+              className="absolute left-0 right-0 overflow-y-auto p-2 space-y-1"
+              style={{ top: '32px', bottom: '48px' }}
+              ref={(el) => { if (el) el.scrollTop = el.scrollHeight }}
+            >
+              {gameStore.chatMessages.map((msg, i) => (
+                <div key={i} className="text-xs">
+                  {msg.type === 'correct' ? (
+                    <div className="pixel-panel-inset !p-1.5 my-1">
+                      <span className="text-pixel-green font-bold pixel-text-shadow">
+                        {msg.player} 猜对了!
+                      </span>
+                    </div>
+                  ) : (
+                    <p className="py-0.5">
+                      <span className={msg.type === 'guess' ? 'text-pixel-blue' : 'text-pixel-tile/60'}>
+                        {msg.player}:
+                      </span>{' '}
+                      <span className="text-pixel-tile/80">{msg.message}</span>
+                    </p>
+                  )}
+                </div>
+              ))}
+            </div>
+            {/* 输入框：绝对定位固定在底部 */}
+            <form
+              className="absolute bottom-0 left-0 right-0 p-2 border-t-2 border-pixel-border-dark"
+              style={{ backgroundColor: 'rgba(22, 22, 30, 0.9)' }}
+              onSubmit={(e) => {
+                e.preventDefault()
+                const form = e.currentTarget
+                const input = form.elements.namedItem('chatInput') as HTMLInputElement
+                const text = input.value.trim()
+                if (!text) return
+                handleSendMessage(text)
+                input.value = ''
+              }}
+            >
+              <input
+                name="chatInput"
+                type="text"
+                placeholder={gameStore.isDrawer ? '画手禁止发言...' : '输入猜测...'}
+                disabled={gameStore.isDrawer}
+                className="pixel-input w-full text-xs !py-2 disabled:opacity-50"
+              />
+            </form>
+          </div>
+        </div>
+      )}
+
       {/* ===== 底部 - 玩家马桶区 ===== */}
-      <TileFloor className="shrink-0 border-t-4 border-pixel-border-dark px-1 md:px-4 py-1 md:py-2">
-        <div className="flex justify-center items-end gap-1 md:gap-3 flex-wrap">
+      <TileFloor className="shrink-0 md:shrink-0 flex-1 md:flex-none border-t-4 border-pixel-border-dark px-1 md:px-4 py-1 md:py-2 relative">
+        {/* 移动端聊天按钮：右上角 */}
+        {!chatOpen && (
+          <button
+            className="mobile-only absolute right-2 -top-8 z-10 pixel-btn text-[10px] !py-1 !px-2"
+            onClick={() => setChatOpen(true)}
+          >
+            ▲ 聊天
+          </button>
+        )}
+        <div className="flex justify-start md:justify-center items-end gap-2 md:gap-3 overflow-x-auto md:overflow-x-visible md:flex-wrap pb-1">
           {gameStore.players
             .filter((p) => p.isConnected)
             .map((player) => {
               const isMe = player.id === playerId
+              const isPoopTarget = poopFlyTargetId === player.id
               return (
-                <PixelPlayerSeat
-                  key={player.id}
-                  name={player.name}
-                  score={player.score}
-                  colorIndex={player.color}
-                  variant="back"
-                  isHost={player.isHost}
-                  scale={isMe ? 3 : 2.5}
-                  className={`${
-                    isMe
-                      ? 'bg-pixel-yellow/15 ring-2 ring-pixel-yellow rounded-lg p-1 relative'
-                      : 'opacity-75'
-                  }`}
-                  onClick={
-                    isMe
-                      ? undefined
-                      : () => {
-                          if (gameStore.myPoopCount > 0) {
-                            send({ type: 'throw_poop', targetId: player.id })
+                <div key={player.id} className="relative shrink-0">
+                  {/* 粑粑飞行动画 */}
+                  {isPoopTarget && (
+                    <div
+                      className="absolute left-1/2 -translate-x-1/2 z-20 pointer-events-none animate-poop-throw"
+                      onAnimationEnd={() => setPoopFlyTargetId(null)}
+                    >
+                      <PixelPoop scale={2.5} />
+                    </div>
+                  )}
+                  <PixelPlayerSeat
+                    name={player.name}
+                    score={player.score}
+                    colorIndex={player.color}
+                    variant="back"
+                    isHost={player.isHost}
+                    scale={isMe ? 3 : 2.5}
+                    className={`${
+                      isMe
+                        ? 'bg-pixel-yellow/15 ring-2 ring-pixel-yellow rounded-lg p-1 relative'
+                        : 'opacity-75'
+                    } ${isPoopTarget ? 'animate-poop-hit-shake' : ''}`}
+                    onClick={
+                      isMe
+                        ? undefined
+                        : () => {
+                            if (gameStore.myPoopCount > 0) {
+                              setPoopFlyTargetId(player.id)
+                              setPoopFlash(true)
+                              setTimeout(() => setPoopFlash(false), 600)
+                              send({ type: 'throw_poop', targetId: player.id })
+                            }
                           }
-                        }
-                  }
-                />
+                    }
+                  />
+                </div>
               )
             })}
         </div>

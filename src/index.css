@@ -66,6 +66,34 @@ body {
   color: white;
   margin: 0;
   overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* 移动端 dvh 支持 */
+.min-h-dvh {
+  min-height: 100vh;
+  min-height: 100dvh;
+}
+.h-dvh {
+  height: 100vh;
+  height: 100dvh;
+}
+
+/* 仅桌面端显示为 flex */
+.desktop-only-flex {
+  display: none !important;
+}
+@media (min-width: 768px) {
+  .desktop-only-flex {
+    display: flex !important;
+  }
+}
+
+/* 仅移动端显示 */
+@media (min-width: 768px) {
+  .mobile-only {
+    display: none !important;
+  }
 }
 
 /* 英文/数字使用像素字体 */
@@ -462,5 +490,71 @@ body {
   0% { transform: translate(0, 0) scale(0) rotate(0); opacity: 0; }
   40% { opacity: 1; }
   100% { transform: translate(20px, -180px) scale(0.6) rotate(15deg); opacity: 0.4; }
+}
+
+/* ======================================
+   粑粑投掷动效
+   ====================================== */
+
+/* 粑粑从上方抛物线砸下 */
+@keyframes poop-throw {
+  0% {
+    top: -80px;
+    transform: translateX(-50%) scale(0.5) rotate(0deg);
+    opacity: 0;
+  }
+  15% {
+    opacity: 1;
+    transform: translateX(-50%) scale(1) rotate(-30deg);
+  }
+  60% {
+    top: -10px;
+    transform: translateX(-50%) scale(1.2) rotate(15deg);
+  }
+  75% {
+    top: 5px;
+    transform: translateX(-50%) scale(0.9) rotate(-5deg);
+  }
+  85% {
+    top: -2px;
+    transform: translateX(-50%) scale(1.05) rotate(2deg);
+  }
+  100% {
+    top: 0px;
+    transform: translateX(-50%) scale(1) rotate(0deg);
+    opacity: 0;
+  }
+}
+
+.animate-poop-throw {
+  animation: poop-throw 0.7s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+/* 被砸中时玩家抖动 */
+@keyframes poop-hit-shake {
+  0%, 100% { transform: translateX(0) translateY(0); }
+  15% { transform: translateX(-3px) translateY(2px); }
+  30% { transform: translateX(4px) translateY(-1px); }
+  45% { transform: translateX(-4px) translateY(1px); }
+  60% { transform: translateX(3px) translateY(-2px); }
+  75% { transform: translateX(-2px) translateY(1px); }
+  90% { transform: translateX(1px) translateY(-1px); }
+}
+
+.animate-poop-hit-shake {
+  animation: poop-hit-shake 0.5s ease-out;
+}
+
+/* 道具栏粑粑数量变化闪动 */
+@keyframes poop-flash {
+  0% { transform: scale(1); filter: brightness(1); }
+  25% { transform: scale(1.4); filter: brightness(1.8); }
+  50% { transform: scale(0.9); filter: brightness(0.8); }
+  75% { transform: scale(1.15); filter: brightness(1.3); }
+  100% { transform: scale(1); filter: brightness(1); }
+}
+
+.animate-poop-flash {
+  animation: poop-flash 0.5s ease-out;
 }
 

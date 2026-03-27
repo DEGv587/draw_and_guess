@@ -38,6 +38,7 @@ export type ServerMessage =
   | { type: 'player_left'; player: Player }
   | { type: 'chat'; player: string; message: string }
   | { type: 'choose_words'; words: string[] }
+  | { type: 'current_word'; word: string }
   | { type: 'hint_update'; hint: string }
   | { type: 'host_changed'; newHost: string }
   | { type: 'poop_hit'; fromPlayer: string; targetPlayer: string }
