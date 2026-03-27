@@ -37,6 +37,7 @@ export default function Home() {
   const [roomCode, setRoomCode] = useState('')
   const [showCreateModal, setShowCreateModal] = useState(false)
   const [rooms, setRooms] = useState<RoomSummary[]>([])
+  const [nicknameError, setNicknameError] = useState(false)
 
   // 登录/注册状态
   const [showAuth, setShowAuth] = useState(false)
@@ -56,8 +57,14 @@ export default function Home() {
     return () => clearInterval(timer)
   }, [])
 
+  const triggerNicknameError = () => {
+    setNicknameError(false)
+    // 强制重新触发动画
+    requestAnimationFrame(() => setNicknameError(true))
+  }
+
   const handleCreateRoom = async (config: RoomConfig) => {
-    if (!nickname.trim()) return
+    if (!nickname.trim()) { triggerNicknameError(); return }
 
     try {
       const res = await api.post<{ roomId: string }>('/rooms', {
@@ -79,7 +86,7 @@ export default function Home() {
 
   const handleJoinRoom = async () => {
     const code = roomCode.trim().toUpperCase()
-    if (!code || !nickname.trim()) return
+    if (!code || !nickname.trim()) { if (!nickname.trim()) triggerNicknameError(); return }
 
     try {
       await api.get(`/rooms/${code}`)
@@ -90,7 +97,7 @@ export default function Home() {
   }
 
   const handleDoorClick = (room: RoomSummary) => {
-    if (!nickname.trim()) return
+    if (!nickname.trim()) { triggerNicknameError(); return }
     const doorStatus = mapDoorStatus(room)
     if (doorStatus === 'full') return
     navigate(`/room/${room.roomId}`, { state: { isHost: false } })
@@ -223,10 +230,10 @@ export default function Home() {
               <input
                 type="text"
                 value={nickname}
-                onChange={(e) => setNickname(e.target.value)}
+                onChange={(e) => { setNickname(e.target.value); setNicknameError(false) }}
                 placeholder="你的昵称..."
                 maxLength={12}
-                className="pixel-input flex-1"
+                className={`pixel-input flex-1 ${nicknameError ? 'pixel-input-error' : ''}`}
                 disabled={!!authUser}
               />
             </div>
@@ -256,7 +263,7 @@ export default function Home() {
 
             {/* 创建按钮 */}
             <button
-              onClick={() => setShowCreateModal(true)}
+              onClick={() => { if (!nickname.trim()) { triggerNicknameError(); return } setShowCreateModal(true) }}
               className="pixel-btn pixel-btn-primary w-full py-3 text-sm tracking-wider"
             >
               创建新厕所

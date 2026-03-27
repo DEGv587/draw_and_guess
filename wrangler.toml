@@ -2,9 +2,9 @@ name = "draw-and-guess"
 compatibility_date = "2024-12-01"
 main = "worker.ts"
 
-# 部署时启用 assets，本地开发由 vite 提供静态文件
-# [assets]
-# directory = "dist"
+# 部署时启用 assets
+[assets]
+directory = "dist"
 
 # 部署前需要替换以下占位 ID:
 # 1. wrangler d1 create draw-and-guess-db → 获取 database_id
@@ -17,12 +17,12 @@ main = "worker.ts"
 [[d1_databases]]
 binding = "DB"
 database_name = "draw-and-guess-db"
-database_id = "placeholder-will-be-replaced-after-creation"
+database_id = "63d9124c-5717-4521-be9c-3f91141359e9"
 
 # KV 命名空间绑定
 [[kv_namespaces]]
 binding = "WORD_KV"
-id = "placeholder-will-be-replaced-after-creation"
+id = "947f9da2a1724983b2802e88d924f0a4"
 
 # Durable Objects 绑定
 [durable_objects]
@@ -32,4 +32,4 @@ bindings = [
 
 [[migrations]]
 tag = "v1"
-new_classes = ["GameRoom"]
+new_sqlite_classes = ["GameRoom"]

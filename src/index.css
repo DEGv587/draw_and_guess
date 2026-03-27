@@ -157,6 +157,21 @@ body {
     inset -4px -4px 0 0 var(--color-pixel-blue-dark);
 }
 
+.pixel-input.pixel-input-error {
+  box-shadow:
+    inset 4px 4px 0 0 #2a0a0a,
+    inset -4px -4px 0 0 var(--color-pixel-red);
+  animation: pixel-shake 0.4s ease-in-out;
+}
+
+@keyframes pixel-shake {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-6px); }
+  40% { transform: translateX(6px); }
+  60% { transform: translateX(-4px); }
+  80% { transform: translateX(4px); }
+}
+
 .pixel-input::placeholder {
   color: #5a5a7a;
 }
