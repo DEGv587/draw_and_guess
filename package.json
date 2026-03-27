@@ -1,0 +1,37 @@
+{
+  "name": "draw-and-guess",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "wrangler dev",
+    "deploy": "pnpm build && wrangler deploy",
+    "db:migrate:local": "wrangler d1 execute draw-and-guess-db --local --file=migrations/0001_init.sql && wrangler d1 execute draw-and-guess-db --local --file=migrations/0002_sessions.sql",
+    "db:migrate:remote": "wrangler d1 execute draw-and-guess-db --remote --file=migrations/0001_init.sql && wrangler d1 execute draw-and-guess-db --remote --file=migrations/0002_sessions.sql",
+    "db:checkpoint": "sqlite3 .wrangler/state/v3/d1/miniflare-D1DatabaseObject/ea20105d8e1e3e3ca724d43c19851a6bbaa39202c4e68c260bb1265be00f421a.sqlite 'PRAGMA wal_checkpoint(TRUNCATE);'"
+  },
+  "packageManager": "pnpm@10.33.0",
+  "dependencies": {
+    "hono": "^4.12.9",
+    "react": "^19.2.4",
+    "react-dom": "^19.2.4",
+    "react-router-dom": "^7.13.2",
+    "zustand": "^5.0.12"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20260317.1",
+    "@tailwindcss/vite": "^4.2.2",
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
+    "@vitejs/plugin-react": "^6.0.1",
+    "tailwindcss": "^4.2.2",
+    "typescript": "^6.0.2",
+    "vite": "^8.0.3",
+    "wrangler": "^4.77.0"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": ["esbuild", "workerd", "sharp"]
+  }
+}

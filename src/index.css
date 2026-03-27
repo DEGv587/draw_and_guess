@@ -1,0 +1,451 @@
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+@import "tailwindcss";
+
+/* ======================================
+   像素字体 — 通过上方 @import 加载 Press Start 2P
+   ====================================== */
+
+@theme {
+  /* 主色调 */
+  --color-pixel-bg: #16161e;
+  --color-pixel-wall: #6b5b4f;
+  --color-pixel-wall-light: #8b7b6f;
+  --color-pixel-wall-dark: #4a3f37;
+  --color-pixel-tile: #e8d5b7;
+  --color-pixel-tile-dark: #d4c1a3;
+
+  /* 厕所门 */
+  --color-pixel-door: #c4943a;
+  --color-pixel-door-dark: #8b6914;
+  --color-pixel-door-frame: #5a4a2a;
+
+  /* 强调色 */
+  --color-pixel-green: #4ade80;
+  --color-pixel-green-dark: #166534;
+  --color-pixel-red: #ef4444;
+  --color-pixel-red-dark: #991b1b;
+  --color-pixel-blue: #60a5fa;
+  --color-pixel-blue-dark: #1e40af;
+  --color-pixel-yellow: #facc15;
+  --color-pixel-yellow-dark: #a16207;
+  --color-pixel-brown: #92400e;
+  --color-pixel-gold: #fbbf24;
+  --color-pixel-gold-dark: #d97706;
+
+  /* UI 面板 */
+  --color-pixel-white: #f5f5f0;
+  --color-pixel-panel: #2a2a4a;
+  --color-pixel-panel-light: #3a3a5a;
+  --color-pixel-border: #5a5a7a;
+  --color-pixel-border-dark: #3a3a5a;
+
+  /* 角色颜色 */
+  --color-pixel-skin: #ffcc99;
+  --color-pixel-skin-dark: #e6b380;
+  --color-pixel-hair: #4a3728;
+  --color-pixel-pipe: #8a9a8a;
+  --color-pixel-pipe-dark: #6a7a6a;
+
+  /* 字体 */
+  --font-pixel: "Press Start 2P", "Courier New", monospace;
+  --font-pixel-cn: "Courier New", monospace;
+}
+
+/* ======================================
+   全局基础
+   ====================================== */
+* {
+  image-rendering: pixelated;
+  -webkit-font-smoothing: none;
+  -moz-osx-font-smoothing: auto;
+}
+
+body {
+  font-family: var(--font-pixel-cn);
+  background-color: var(--color-pixel-bg);
+  color: white;
+  margin: 0;
+  overflow-x: hidden;
+}
+
+/* 英文/数字使用像素字体 */
+.font-pixel {
+  font-family: var(--font-pixel);
+}
+
+/* ======================================
+   像素风按钮
+   ====================================== */
+.pixel-btn {
+  position: relative;
+  border: none;
+  background-color: var(--color-pixel-panel);
+  color: white;
+  padding: 10px 20px;
+  font-family: var(--font-pixel-cn);
+  font-size: 14px;
+  cursor: pointer;
+  transition: transform 0.05s;
+  box-shadow:
+    inset -4px -4px 0 0 var(--color-pixel-border-dark),
+    inset 4px 4px 0 0 var(--color-pixel-panel-light),
+    0 4px 0 0 #1a1a2e;
+}
+
+.pixel-btn:hover {
+  background-color: var(--color-pixel-panel-light);
+}
+
+.pixel-btn:active {
+  transform: translateY(2px);
+  box-shadow:
+    inset 4px 4px 0 0 var(--color-pixel-border-dark),
+    inset -4px -4px 0 0 var(--color-pixel-panel-light),
+    0 2px 0 0 #1a1a2e;
+}
+
+.pixel-btn-primary {
+  background-color: var(--color-pixel-green-dark);
+  box-shadow:
+    inset -4px -4px 0 0 #0f4a22,
+    inset 4px 4px 0 0 #1a7a3a,
+    0 4px 0 0 #1a1a2e;
+}
+
+.pixel-btn-primary:hover {
+  background-color: #15803d;
+}
+
+.pixel-btn-primary:active {
+  box-shadow:
+    inset 4px 4px 0 0 #0f4a22,
+    inset -4px -4px 0 0 #1a7a3a,
+    0 2px 0 0 #1a1a2e;
+}
+
+.pixel-btn-danger {
+  background-color: var(--color-pixel-red-dark);
+  box-shadow:
+    inset -4px -4px 0 0 #6b1010,
+    inset 4px 4px 0 0 #c43030,
+    0 4px 0 0 #1a1a2e;
+}
+
+.pixel-btn-danger:hover {
+  background-color: #b91c1c;
+}
+
+/* ======================================
+   像素风输入框
+   ====================================== */
+.pixel-input {
+  background-color: #1a1a2e;
+  color: white;
+  padding: 10px 14px;
+  font-family: var(--font-pixel-cn);
+  font-size: 14px;
+  outline: none;
+  border: none;
+  box-shadow:
+    inset 4px 4px 0 0 #0e0e1a,
+    inset -4px -4px 0 0 var(--color-pixel-border-dark);
+}
+
+.pixel-input:focus {
+  box-shadow:
+    inset 4px 4px 0 0 #0e0e1a,
+    inset -4px -4px 0 0 var(--color-pixel-blue-dark);
+}
+
+.pixel-input::placeholder {
+  color: #5a5a7a;
+}
+
+/* ======================================
+   像素风面板/卡片
+   ====================================== */
+.pixel-panel {
+  background-color: var(--color-pixel-panel);
+  box-shadow:
+    inset -4px -4px 0 0 var(--color-pixel-border-dark),
+    inset 4px 4px 0 0 var(--color-pixel-panel-light);
+  padding: 16px;
+}
+
+.pixel-panel-inset {
+  background-color: #1a1a2e;
+  box-shadow:
+    inset 4px 4px 0 0 #0e0e1a,
+    inset -4px -4px 0 0 var(--color-pixel-border-dark);
+  padding: 12px;
+}
+
+/* ======================================
+   场景纹理
+   ====================================== */
+
+/* 砖墙纹理 */
+.brick-wall {
+  background-color: var(--color-pixel-wall);
+  background-image:
+    linear-gradient(
+      to right,
+      var(--color-pixel-wall-dark) 1px,
+      transparent 1px
+    ),
+    linear-gradient(
+      to bottom,
+      var(--color-pixel-wall-dark) 1px,
+      transparent 1px
+    );
+  background-size: 48px 24px;
+  background-position: 0 0, 24px 12px;
+}
+
+/* 棋盘格瓷砖地面 */
+.tile-floor {
+  background-color: var(--color-pixel-tile);
+  background-image:
+    linear-gradient(45deg, var(--color-pixel-tile-dark) 25%, transparent 25%),
+    linear-gradient(-45deg, var(--color-pixel-tile-dark) 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, var(--color-pixel-tile-dark) 75%),
+    linear-gradient(-45deg, transparent 75%, var(--color-pixel-tile-dark) 75%);
+  background-size: 32px 32px;
+  background-position: 0 0, 0 16px, 16px -16px, -16px 0;
+}
+
+/* ======================================
+   像素风动画
+   ====================================== */
+@keyframes pixel-bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+
+@keyframes pixel-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-3px); }
+}
+
+@keyframes pixel-blink {
+  0%, 90%, 100% { opacity: 1; }
+  95% { opacity: 0; }
+}
+
+@keyframes pixel-shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-2px); }
+  75% { transform: translateX(2px); }
+}
+
+@keyframes confetti-fall {
+  0% { transform: translateY(-10px) rotate(0deg); opacity: 1; }
+  100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+}
+
+@keyframes pulse-glow {
+  0%, 100% { filter: brightness(1); }
+  50% { filter: brightness(1.3); }
+}
+
+.animate-bounce-pixel {
+  animation: pixel-bounce 0.6s ease-in-out infinite;
+}
+
+.animate-float {
+  animation: pixel-float 2s ease-in-out infinite;
+}
+
+.animate-blink {
+  animation: pixel-blink 3s ease-in-out infinite;
+}
+
+.animate-shake {
+  animation: pixel-shake 0.3s ease-in-out;
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+
+/* 坐下动画 */
+@keyframes sit-down {
+  0% { transform: translateY(-20px); opacity: 0; }
+  40% { transform: translateY(4px); opacity: 1; }
+  60% { transform: translateY(-2px); }
+  80% { transform: translateY(1px); }
+  100% { transform: translateY(0); }
+}
+
+.animate-sit-down {
+  animation: sit-down 0.5s ease-out;
+}
+
+@keyframes round-splash {
+  0% { transform: scale(0.3); opacity: 0; }
+  30% { transform: scale(1.1); opacity: 1; }
+  50% { transform: scale(1); }
+  85% { transform: scale(1); opacity: 1; }
+  100% { transform: scale(1.05); opacity: 0; }
+}
+
+.animate-round-splash {
+  animation: round-splash 2s ease-out forwards;
+}
+
+@keyframes score-pop {
+  0% { transform: translateY(10px); opacity: 0; }
+  40% { transform: translateY(-2px); opacity: 1; }
+  100% { transform: translateY(0); opacity: 1; }
+}
+
+.animate-score-pop {
+  animation: score-pop 0.4s ease-out forwards;
+}
+
+/* ======================================
+   扫描线效果（复古 CRT 感）
+   ====================================== */
+.scanlines::after {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0, 0, 0, 0.03) 2px,
+    rgba(0, 0, 0, 0.03) 4px
+  );
+  pointer-events: none;
+  z-index: 9999;
+}
+
+/* ======================================
+   像素文字描边效果
+   ====================================== */
+.pixel-text-shadow {
+  text-shadow:
+    2px 0 0 #000,
+    -2px 0 0 #000,
+    0 2px 0 #000,
+    0 -2px 0 #000;
+}
+
+.pixel-text-glow {
+  text-shadow:
+    2px 0 0 #000,
+    -2px 0 0 #000,
+    0 2px 0 #000,
+    0 -2px 0 #000,
+    0 0 10px currentColor;
+}
+
+/* ======================================
+   屎粑粑砸中效果
+   ====================================== */
+
+/* 全屏模糊底层 */
+.poop-blur-bg {
+  position: fixed;
+  inset: 0;
+  backdrop-filter: blur(8px);
+  background: rgba(90, 60, 20, 0.3);
+  animation: poop-blur-in 0.3s ease-out forwards;
+  z-index: 40;
+}
+
+@keyframes poop-blur-in {
+  0% { opacity: 0; }
+  100% { opacity: 1; }
+}
+
+/* 中心粑粑飞溅容器 */
+.poop-impact {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 41;
+  pointer-events: none;
+}
+
+/* 中心大粑粑 */
+.poop-center {
+  font-size: 120px;
+  animation: poop-slam 0.5s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  filter: drop-shadow(0 0 30px rgba(90, 50, 10, 0.8));
+}
+
+@keyframes poop-slam {
+  0% { transform: scale(0) translateY(-200px) rotate(-30deg); opacity: 0; }
+  50% { transform: scale(1.3) translateY(0) rotate(10deg); opacity: 1; }
+  70% { transform: scale(0.9) translateY(0) rotate(-5deg); }
+  100% { transform: scale(1) translateY(0) rotate(0deg); opacity: 1; }
+}
+
+/* 飞溅小粑粑 */
+.poop-splat-particle {
+  position: absolute;
+  font-size: 40px;
+  animation: poop-particle-fly 0.6s ease-out forwards;
+}
+
+.poop-splat-particle:nth-child(2) {
+  animation-delay: 0.05s;
+}
+.poop-splat-particle:nth-child(3) {
+  animation-delay: 0.1s;
+}
+.poop-splat-particle:nth-child(4) {
+  animation-delay: 0.08s;
+}
+.poop-splat-particle:nth-child(5) {
+  animation-delay: 0.12s;
+}
+.poop-splat-particle:nth-child(6) {
+  animation-delay: 0.15s;
+}
+
+@keyframes poop-particle-fly {
+  0% { transform: translate(0, 0) scale(0) rotate(0deg); opacity: 0; }
+  40% { opacity: 1; }
+  100% { opacity: 0.6; }
+}
+
+.poop-particle-1 { animation-name: poop-fly-1; }
+.poop-particle-2 { animation-name: poop-fly-2; }
+.poop-particle-3 { animation-name: poop-fly-3; }
+.poop-particle-4 { animation-name: poop-fly-4; }
+.poop-particle-5 { animation-name: poop-fly-5; }
+
+@keyframes poop-fly-1 {
+  0% { transform: translate(0, 0) scale(0) rotate(0); opacity: 0; }
+  40% { opacity: 1; }
+  100% { transform: translate(-180px, -120px) scale(1) rotate(-45deg); opacity: 0.4; }
+}
+@keyframes poop-fly-2 {
+  0% { transform: translate(0, 0) scale(0) rotate(0); opacity: 0; }
+  40% { opacity: 1; }
+  100% { transform: translate(160px, -140px) scale(0.8) rotate(30deg); opacity: 0.4; }
+}
+@keyframes poop-fly-3 {
+  0% { transform: translate(0, 0) scale(0) rotate(0); opacity: 0; }
+  40% { opacity: 1; }
+  100% { transform: translate(-200px, 80px) scale(0.7) rotate(-60deg); opacity: 0.4; }
+}
+@keyframes poop-fly-4 {
+  0% { transform: translate(0, 0) scale(0) rotate(0); opacity: 0; }
+  40% { opacity: 1; }
+  100% { transform: translate(190px, 100px) scale(0.9) rotate(50deg); opacity: 0.4; }
+}
+@keyframes poop-fly-5 {
+  0% { transform: translate(0, 0) scale(0) rotate(0); opacity: 0; }
+  40% { opacity: 1; }
+  100% { transform: translate(20px, -180px) scale(0.6) rotate(15deg); opacity: 0.4; }
+}
+
