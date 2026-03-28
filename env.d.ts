@@ -5,4 +5,5 @@ interface Env {
   DB: D1Database
   WORD_KV: KVNamespace
   GAME_ROOM: DurableObjectNamespace
+  ASSETS: Fetcher
 }

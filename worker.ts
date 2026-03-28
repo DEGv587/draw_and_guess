@@ -339,6 +339,12 @@ app.get('/ws/:roomId', async (c) => {
 
 export default {
   async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
-    return app.fetch(request, env, ctx)
+    const url = new URL(request.url)
+    // API 和 WebSocket 请求走 Hono 路由
+    if (url.pathname.startsWith('/api/') || url.pathname.startsWith('/ws/')) {
+      return app.fetch(request, env, ctx)
+    }
+    // 其他请求交给 assets（SPA 回退）
+    return env.ASSETS.fetch(request)
   },
 } satisfies ExportedHandler<Env>
