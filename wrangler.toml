@@ -5,6 +5,7 @@ main = "worker.ts"
 # 部署时启用 assets
 [assets]
 directory = "dist"
+not_found_handling = "single-page-application"
 
 # 部署前需要替换以下占位 ID:
 # 1. wrangler d1 create draw-and-guess-db → 获取 database_id
