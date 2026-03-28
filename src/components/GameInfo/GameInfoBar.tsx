@@ -43,7 +43,7 @@ export default function GameInfoBar({
   return (
     <PixelPanel className="flex items-center justify-between px-2 md:px-4 py-1.5 md:py-2 !p-0">
       <div className="flex items-center gap-1.5 md:gap-4 px-2 md:px-4 py-1.5 md:py-2 min-w-0 overflow-hidden">
-        <span className="text-pixel-tile/60 text-[10px] md:text-xs hidden md:inline shrink-0">#{roomId}</span>
+        <span className="text-pixel-tile/60 text-[10px] md:text-xs hidden md:inline shrink-0">{roomId}</span>
         <div className="flex items-center gap-1 min-w-0">
           <span className="text-pixel-tile text-[10px] md:text-xs hidden md:inline shrink-0">
             {isDrawer ? '当前词:' : '提示:'}

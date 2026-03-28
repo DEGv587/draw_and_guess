@@ -60,7 +60,7 @@ export default function WaitingRoom({
         <PixelPanel className="w-full max-w-2xl mb-6 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <span className="text-pixel-tile/60 text-xs">房间</span>
-            <span className="font-pixel text-sm text-pixel-yellow pixel-text-shadow">#{roomId}</span>
+            <span className="font-pixel text-sm text-pixel-yellow pixel-text-shadow">{roomId}</span>
           </div>
           <div className="flex items-center gap-3">
             <span className="text-pixel-tile text-xs">

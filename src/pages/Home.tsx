@@ -199,7 +199,7 @@ export default function Home() {
                   <span className="font-pixel text-[8px] text-pixel-tile">
                     {room.playerCount}/{room.maxPlayers}
                   </span>
-                  <span className="font-pixel text-[7px] text-pixel-tile/50">#{room.roomId}</span>
+                  <span className="font-pixel text-[7px] text-pixel-tile/50">{room.roomId}</span>
                 </button>
               )
             })
