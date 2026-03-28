@@ -6,6 +6,7 @@ interface UseWebSocketOptions {
   playerId: string
   playerName: string
   colorIndex: number
+  authToken?: string | null
   onMessage: (msg: ServerMessage) => void
   onConnect?: () => void
   onDisconnect?: () => void
@@ -19,6 +20,7 @@ export function useWebSocket({
   playerId,
   playerName,
   colorIndex,
+  authToken,
   onMessage,
   onConnect,
   onDisconnect,
@@ -29,8 +31,8 @@ export function useWebSocket({
   const retryTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   // 用 ref 保存所有参数和回调，避免依赖变化导致反复重连
-  const paramsRef = useRef({ roomId, playerId, playerName, colorIndex })
-  paramsRef.current = { roomId, playerId, playerName, colorIndex }
+  const paramsRef = useRef({ roomId, playerId, playerName, colorIndex, authToken })
+  paramsRef.current = { roomId, playerId, playerName, colorIndex, authToken }
 
   const callbacksRef = useRef({ onMessage, onConnect, onDisconnect })
   callbacksRef.current = { onMessage, onConnect, onDisconnect }
@@ -42,13 +44,14 @@ export function useWebSocket({
       if (state === WebSocket.OPEN || state === WebSocket.CONNECTING) return
     }
 
-    const { roomId: rid, playerId: pid, playerName: pname, colorIndex: cidx } = paramsRef.current
+    const { roomId: rid, playerId: pid, playerName: pname, colorIndex: cidx, authToken: token } = paramsRef.current
     const wsHost = import.meta.env.DEV ? 'localhost:8787' : location.host
     const protocol = location.protocol === 'https:' ? 'wss:' : 'ws:'
     const params = new URLSearchParams({
       playerId: pid,
       name: pname,
       color: String(cidx),
+      ...(token ? { token } : {}),
     })
     const url = `${protocol}//${wsHost}/ws/${rid}?${params}`
 

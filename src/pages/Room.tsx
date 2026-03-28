@@ -47,9 +47,9 @@ export default function Room() {
   const routeState = (location.state ?? {}) as { config?: RoomConfig; isHost?: boolean; playAgain?: boolean }
   const config = routeState.config ?? DEFAULT_CONFIG
 
-  const { playerId, nickname, colorIndex } = usePlayerStore()
+  const { playerId, nickname, colorIndex, authUser, authToken } = usePlayerStore()
   const gameStore = useGameStore()
-  const displayTime = useCountdown(gameStore.timeLeft)
+  const displayTime = useCountdown(gameStore.timeLeft, gameStore.timeLeftKey)
 
   // 初始化 myPlayerId
   useEffect(() => {
@@ -68,6 +68,7 @@ export default function Room() {
     playerId,
     playerName: nickname || `玩家${playerId.slice(0, 4)}`,
     colorIndex,
+    authToken,
     onMessage: handleMessage,
     onConnect: () => {
       gameStore.setConnected(true)
@@ -221,6 +222,13 @@ export default function Room() {
   // 移动端聊天折叠
   const [chatOpen, setChatOpen] = useState(false)
 
+  // 回合结束/选词阶段自动关闭移动端聊天框，避免遮盖提示
+  useEffect(() => {
+    if (gameStore.status === 'round_end' || gameStore.status === 'choosing') {
+      setChatOpen(false)
+    }
+  }, [gameStore.status])
+
   // 粑粑投掷动效
   const [poopFlyTargetId, setPoopFlyTargetId] = useState<string | null>(null)
   const [poopFlash, setPoopFlash] = useState(false)
@@ -343,6 +351,7 @@ export default function Room() {
         currentRound={gameStore.currentRound || 1}
         totalRounds={gameStore.totalRounds}
         poopCount={gameStore.myPoopCount}
+        isAdmin={gameStore.isAdmin}
         poopFlash={poopFlash}
         onExit={handleLeave}
       />
@@ -462,7 +471,7 @@ export default function Room() {
             </div>
             {/* 输入框：绝对定位固定在底部 */}
             <form
-              className="absolute bottom-0 left-0 right-0 p-2 border-t-2 border-pixel-border-dark"
+              className="absolute bottom-0 left-0 right-0 p-2 border-t-2 border-pixel-border-dark flex gap-2"
               style={{ backgroundColor: 'rgba(22, 22, 30, 0.9)' }}
               onSubmit={(e) => {
                 e.preventDefault()
@@ -479,8 +488,11 @@ export default function Room() {
                 type="text"
                 placeholder={gameStore.isDrawer ? '画手禁止发言...' : '输入猜测...'}
                 disabled={gameStore.isDrawer}
-                className="pixel-input w-full text-xs !py-2 disabled:opacity-50"
+                className="pixel-input flex-1 text-xs !py-2 disabled:opacity-50"
               />
+              <button type="submit" disabled={gameStore.isDrawer} className="pixel-btn pixel-btn-primary text-[10px] !py-2 !px-3 shrink-0 disabled:opacity-40">
+                发送
+              </button>
             </form>
           </div>
         </div>
@@ -530,7 +542,7 @@ export default function Room() {
                       isMe
                         ? undefined
                         : () => {
-                            if (gameStore.myPoopCount > 0) {
+                            if (gameStore.isAdmin || gameStore.myPoopCount > 0) {
                               setPoopFlyTargetId(player.id)
                               setPoopFlash(true)
                               setTimeout(() => setPoopFlash(false), 600)

@@ -17,6 +17,8 @@ interface GameInfoBarProps {
   totalRounds: number
   /** 屎粑粑数量 */
   poopCount: number
+  /** 是否管理员（无限粑粑） */
+  isAdmin?: boolean
   /** 粑粑数量变化时闪动 */
   poopFlash?: boolean
   onExit: () => void
@@ -31,6 +33,7 @@ export default function GameInfoBar({
   currentRound,
   totalRounds,
   poopCount,
+  isAdmin,
   poopFlash,
   onExit,
 }: GameInfoBarProps) {
@@ -71,7 +74,7 @@ export default function GameInfoBar({
         {/* 屎粑粑 */}
         <div className={`flex items-center gap-0.5 cursor-pointer hover:scale-110 transition-transform ${poopFlash ? 'animate-poop-flash' : ''}`}>
           <PixelPoop scale={1.5} />
-          <span className="font-pixel text-[10px] text-pixel-yellow">x{poopCount}</span>
+          <span className="font-pixel text-[10px] text-pixel-yellow">{isAdmin ? '∞' : `x${poopCount}`}</span>
         </div>
 
         {/* 退出 */}

@@ -5,6 +5,7 @@ import { ToiletScene, PixelPanel } from '../components/ui/PixelScene'
 import CreateRoomModal, { type RoomConfig } from '../components/Lobby/CreateRoomModal'
 import { usePlayerStore } from '../stores/playerStore'
 import { api } from '../utils/api'
+import { GAME_CONSTANTS } from '@shared/constants'
 
 interface RoomSummary {
   roomId: string
@@ -66,6 +67,9 @@ export default function Home() {
   const handleCreateRoom = async (config: RoomConfig) => {
     if (!nickname.trim()) { triggerNicknameError(); return }
 
+    const code = roomCode.trim().toUpperCase()
+    if (code && !/^[A-Z0-9]{1,5}$/.test(code)) { alert('房间号仅支持数字和英文，最多5位'); return }
+
     try {
       const res = await api.post<{ roomId: string }>('/rooms', {
         settings: {
@@ -77,10 +81,11 @@ export default function Home() {
         hostId: playerId,
         hostName: nickname,
         hostColor: colorIndex,
+        ...(code ? { customRoomId: code } : {}),
       })
       navigate(`/room/${res.roomId}`, { state: { config, isHost: true } })
-    } catch (err) {
-      console.error('创建房间失败:', err)
+    } catch (err: unknown) {
+      alert(err instanceof Error ? err.message : '创建房间失败')
     }
   }
 
@@ -94,6 +99,19 @@ export default function Home() {
     } catch {
       alert('房间不存在')
     }
+  }
+
+  const handleCreateWithCode = () => {
+    const code = roomCode.trim().toUpperCase()
+    if (!code) { alert('请输入房间号'); return }
+    if (!/^[A-Z0-9]{1,5}$/.test(code)) { alert('房间号仅支持数字和英文，最多5位'); return }
+    handleCreateRoom({
+      seats: GAME_CONSTANTS.DEFAULT_SEATS,
+      rounds: GAME_CONSTANTS.DEFAULT_ROUNDS,
+      drawTime: GAME_CONSTANTS.DEFAULT_DRAW_TIME,
+      wordMode: 'random',
+      customWords: '',
+    })
   }
 
   const handleDoorClick = (room: RoomSummary) => {
@@ -244,13 +262,16 @@ export default function Home() {
               <input
                 type="text"
                 value={roomCode}
-                onChange={(e) => setRoomCode(e.target.value)}
+                onChange={(e) => setRoomCode(e.target.value.replace(/[^a-zA-Z0-9]/g, '').slice(0, 5))}
                 placeholder="输入房间号..."
-                maxLength={6}
+                maxLength={5}
                 className="pixel-input flex-1"
               />
               <button onClick={handleJoinRoom} className="pixel-btn text-sm">
                 加入
+              </button>
+              <button onClick={handleCreateWithCode} className="pixel-btn pixel-btn-primary text-sm">
+                创建
               </button>
             </div>
 

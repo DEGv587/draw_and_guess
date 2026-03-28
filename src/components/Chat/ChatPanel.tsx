@@ -56,15 +56,18 @@ export default function ChatPanel({ messages, isDrawer = false, onSend, classNam
       </div>
 
       {/* 输入框 */}
-      <form onSubmit={handleSubmit} className="p-2 border-t-2 border-pixel-border-dark shrink-0">
+      <form onSubmit={handleSubmit} className="p-2 border-t-2 border-pixel-border-dark shrink-0 flex gap-2">
         <input
           type="text"
           value={input}
           onChange={(e) => setInput(e.target.value)}
           placeholder={isDrawer ? '画手禁止发言...' : '输入猜测...'}
           disabled={isDrawer}
-          className="pixel-input w-full text-xs !py-2 disabled:opacity-50"
+          className="pixel-input flex-1 text-xs !py-2 disabled:opacity-50"
         />
+        <button type="submit" disabled={isDrawer || !input.trim()} className="pixel-btn pixel-btn-primary text-[10px] !py-2 !px-3 shrink-0 disabled:opacity-40">
+          发送
+        </button>
       </form>
     </div>
   )

@@ -47,9 +47,13 @@ interface GameState {
   pendingDrawActions: DrawAction[]
   drawActionVersion: number
 
+  // 倒计时重启标记
+  timeLeftKey: number
+
   // 计算属性
   isHost: boolean
   isDrawer: boolean
+  isAdmin: boolean
   myPoopCount: number
 
   // Actions
@@ -91,8 +95,10 @@ const INITIAL_STATE = {
   scoreDeltas: {},
   pendingDrawActions: [],
   drawActionVersion: 0,
+  timeLeftKey: 0,
   isHost: false,
   isDrawer: false,
+  isAdmin: false,
   myPoopCount: 0,
 }
 
@@ -122,6 +128,7 @@ export const useGameStore = create<GameState>((set, get) => ({
           timeLeft: data.timeLeft,
           isHost: me?.isHost ?? false,
           isDrawer: data.currentDrawer === state.myPlayerId,
+          isAdmin: me?.isAdmin ?? false,
           myPoopCount: me?.poopCount ?? 0,
         })
         break
@@ -174,6 +181,7 @@ export const useGameStore = create<GameState>((set, get) => ({
             currentDrawer: msg.drawer,
             hint: msg.hint,
             timeLeft: msg.duration,
+            timeLeftKey: s.timeLeftKey + 1,
             isDrawer: amDrawer,
             isNewRound: msg.isNewRound,
             wordChoices: null,

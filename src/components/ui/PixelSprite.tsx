@@ -198,7 +198,7 @@ export function PixelToilet({
 // PixelCharacter — 角色
 // ============================================================
 
-function makeCharacterPixels(variant: 'front' | 'back', colorIndex: number): PixelData {
+function makeCharacterPixels(variant: 'front' | 'back', colorIndex: number, shocked = false): PixelData {
   const shirt = C.shirts[colorIndex % C.shirts.length]
 
   if (variant === 'front') {
@@ -209,23 +209,56 @@ function makeCharacterPixels(variant: 'front' | 'back', colorIndex: number): Pix
       [3, 1, C.hair], [4, 1, C.hair], [5, 1, C.hair], [6, 1, C.hair], [7, 1, C.hair], [8, 1, C.hair],
       // 脸 (row 2-5)
       [3, 2, C.skin], [4, 2, C.skin], [5, 2, C.skin], [6, 2, C.skin], [7, 2, C.skin], [8, 2, C.skin],
-      [3, 3, C.skin], [4, 3, C.eye], [5, 3, C.skin], [6, 3, C.skin], [7, 3, C.eye], [8, 3, C.skin],
-      [3, 4, C.skin], [4, 4, C.skin], [5, 4, C.skin], [6, 4, C.skin], [7, 4, C.skin], [8, 4, C.skin],
-      [5, 4, C.mouth], [6, 4, C.mouth],
-      [3, 5, C.skin], [4, 5, C.skin], [5, 5, C.skin], [6, 5, C.skin], [7, 5, C.skin], [8, 5, C.skin],
+    ]
+
+    if (shocked) {
+      // 惊讶表情：眼睛更大（上下各加一像素），嘴张大成 O 形
+      pixels.push(
+        // 眼睛加大 — 上方加白色高光
+        [4, 2, '#ffffff'], [7, 2, '#ffffff'],
+        // 眼珠
+        [4, 3, C.eye], [7, 3, C.eye],
+        // 眼睛下方也加白
+        [3, 3, C.skin], [5, 3, C.skin], [6, 3, C.skin], [8, 3, C.skin],
+        // row 4 — 嘴部区域，张大O嘴
+        [3, 4, C.skin], [4, 4, C.skin], [5, 4, C.black], [6, 4, C.black], [7, 4, C.skin], [8, 4, C.skin],
+        // row 5 — O嘴下半部分
+        [3, 5, C.skin], [4, 5, C.skin], [5, 5, C.black], [6, 5, C.black], [7, 5, C.skin], [8, 5, C.skin],
+      )
+    } else {
+      pixels.push(
+        [3, 3, C.skin], [4, 3, C.eye], [5, 3, C.skin], [6, 3, C.skin], [7, 3, C.eye], [8, 3, C.skin],
+        [3, 4, C.skin], [4, 4, C.skin], [5, 4, C.skin], [6, 4, C.skin], [7, 4, C.skin], [8, 4, C.skin],
+        [5, 4, C.mouth], [6, 4, C.mouth],
+        [3, 5, C.skin], [4, 5, C.skin], [5, 5, C.skin], [6, 5, C.skin], [7, 5, C.skin], [8, 5, C.skin],
+      )
+    }
+
+    pixels.push(
       // 脖子 (row 6)
       [4, 6, C.skinDark], [5, 6, C.skinDark], [6, 6, C.skinDark], [7, 6, C.skinDark],
       // 身体上部 (row 7-9)
       [3, 7, shirt], [4, 7, shirt], [5, 7, shirt], [6, 7, shirt], [7, 7, shirt], [8, 7, shirt],
       [2, 8, C.skin], [3, 8, shirt], [4, 8, shirt], [5, 8, shirt], [6, 8, shirt], [7, 8, shirt], [8, 8, shirt], [9, 8, C.skin],
       [2, 9, C.skin], [3, 9, shirt], [4, 9, shirt], [5, 9, shirt], [6, 9, shirt], [7, 9, shirt], [8, 9, shirt], [9, 9, C.skin],
+    )
+
+    if (shocked) {
+      // 惊讶时双手举起 — 手臂伸出
+      pixels.push(
+        [1, 7, C.skin], [10, 7, C.skin],
+        [0, 6, C.skin], [11, 6, C.skin],
+      )
+    }
+
+    pixels.push(
       // 身体下部，坐姿弯曲 (row 10-11)
       [1, 10, C.skin], [2, 10, shirt], [3, 10, shirt], [4, 10, shirt], [5, 10, shirt], [6, 10, shirt], [7, 10, shirt], [8, 10, shirt], [9, 10, shirt], [10, 10, C.skin],
       [1, 11, C.skinDark], [2, 11, shirt], [3, 11, shirt], [4, 11, shirt], [5, 11, shirt], [6, 11, shirt], [7, 11, shirt], [8, 11, shirt], [9, 11, shirt], [10, 11, C.skinDark],
       // 大腿，水平坐姿 (row 12-13)
       [1, 12, C.skin], [2, 12, C.skin], [3, 12, shirt], [4, 12, shirt], [7, 12, shirt], [8, 12, shirt], [9, 12, C.skin], [10, 12, C.skin],
       [1, 13, C.skinDark], [2, 13, C.skinDark], [3, 13, C.skinDark], [4, 13, C.skinDark], [7, 13, C.skinDark], [8, 13, C.skinDark], [9, 13, C.skinDark], [10, 13, C.skinDark],
-    ]
+    )
     return { width: 12, height: 14, pixels }
   } else {
     // 12x14 背面角色（坐姿，比例更真实）
@@ -257,15 +290,17 @@ function makeCharacterPixels(variant: 'front' | 'back', colorIndex: number): Pix
 export function PixelCharacter({
   variant = 'front',
   colorIndex = 0,
+  shocked = false,
   scale = 3,
   className = '',
 }: {
   variant?: 'front' | 'back'
   colorIndex?: number
+  shocked?: boolean
   scale?: number
   className?: string
 }) {
-  return <PixelRenderer data={makeCharacterPixels(variant, colorIndex)} scale={scale} className={className} />
+  return <PixelRenderer data={makeCharacterPixels(variant, colorIndex, shocked)} scale={scale} className={className} />
 }
 
 // ============================================================
@@ -493,6 +528,7 @@ export function PixelPlayerSeat({
   isHost = false,
   guessedCorrect = false,
   hasPoopOnHead = false,
+  shocked = false,
   gold = false,
   scale = 3,
   className = '',
@@ -505,6 +541,7 @@ export function PixelPlayerSeat({
   isHost?: boolean
   guessedCorrect?: boolean
   hasPoopOnHead?: boolean
+  shocked?: boolean
   gold?: boolean
   scale?: number
   className?: string
@@ -524,7 +561,7 @@ export function PixelPlayerSeat({
       {/* 角色坐在马桶上 — 角色下半身嵌入马桶 */}
       <div className="relative">
         <div className="relative z-10" style={{ marginBottom: -scale * 6 }}>
-          <PixelCharacter variant={variant} colorIndex={colorIndex} scale={scale} />
+          <PixelCharacter variant={variant} colorIndex={colorIndex} shocked={shocked} scale={scale} />
         </div>
         <div className="relative z-0">
           <PixelToilet variant={variant} gold={gold} scale={scale} />

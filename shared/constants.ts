@@ -1,8 +1,8 @@
 export const GAME_CONSTANTS = {
-  MAX_PLAYERS: 10,
+  MAX_PLAYERS: 8,
   MIN_PLAYERS: 2,
   DEFAULT_SEATS: 6,
-  SEAT_COUNT_OPTIONS: [2, 3, 4, 5, 6, 7, 8, 9, 10] as const,
+  SEAT_COUNT_OPTIONS: [2, 3, 4, 5, 6, 7, 8] as const,
   DEFAULT_ROUNDS: 3,
   MIN_ROUNDS: 1,
   MAX_ROUNDS: 10,
@@ -24,6 +24,7 @@ export const GAME_CONSTANTS = {
   POOP_EFFECT_DURATION: 3,
   SEAT_POOP_MIN: 1,
   SEAT_POOP_MAX: 3,
+  ADMIN_POOP_COUNT: 999,
 
   // 词库模式
   WORD_MODES: ['random', 'custom'] as const,
@@ -32,6 +33,8 @@ export const GAME_CONSTANTS = {
   WORD_CATEGORIES: [
     'animals', 'food', 'daily', 'sports',
     'nature', 'occupations', 'places', 'actions',
+    'vehicles', 'clothing', 'entertainment', 'buildings',
+    'fantasy', 'idioms', 'poetry',
   ] as const,
 
   // 词库分类中文名
@@ -44,6 +47,13 @@ export const GAME_CONSTANTS = {
     occupations: '职业',
     places: '地点',
     actions: '动作',
+    vehicles: '交通工具',
+    clothing: '服饰',
+    entertainment: '娱乐',
+    buildings: '建筑',
+    fantasy: '奇幻',
+    idioms: '成语',
+    poetry: '诗词',
   } as const,
 } as const
 

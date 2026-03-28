@@ -558,3 +558,20 @@ body {
   animation: poop-flash 0.5s ease-out;
 }
 
+/* 被粑粑砸中：闪白 + 抖动 + 缩放弹跳 */
+@keyframes poop-hit-flash {
+  0%   { filter: brightness(1); transform: scale(1) translate(0, 0); }
+  8%   { filter: brightness(4) saturate(0); transform: scale(1.15) translate(-3px, 2px); }
+  16%  { filter: brightness(1.2); transform: scale(0.92) translate(4px, -2px); }
+  24%  { filter: brightness(3.5) saturate(0); transform: scale(1.1) translate(-4px, 1px); }
+  36%  { filter: brightness(1); transform: scale(0.95) translate(3px, -1px); }
+  48%  { filter: brightness(2.5) saturate(0.2); transform: scale(1.06) translate(-2px, 2px); }
+  60%  { filter: brightness(1); transform: scale(0.98) translate(2px, -1px); }
+  75%  { filter: brightness(1.6); transform: scale(1.02) translate(-1px, 1px); }
+  100% { filter: brightness(1); transform: scale(1) translate(0, 0); }
+}
+
+.animate-poop-hit-flash {
+  animation: poop-hit-flash 0.7s ease-out;
+}
+

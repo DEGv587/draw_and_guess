@@ -51,6 +51,7 @@ export class GameRoom extends DurableObject<Env> {
       isConnected: p.isConnected,
       poopCount: p.poopCount,
       seatIndex: p.seatIndex,
+      isAdmin: p.isAdmin,
     }
   }
 
@@ -120,6 +121,7 @@ export class GameRoom extends DurableObject<Env> {
       const playerId = url.searchParams.get('playerId')
       const rawName = url.searchParams.get('name')
       const color = parseInt(url.searchParams.get('color') ?? '0', 10)
+      const isAdmin = url.searchParams.get('admin') === '1'
       const name = rawName ? sanitizeName(rawName) : null
 
       if (playerId && name) {
@@ -138,6 +140,17 @@ export class GameRoom extends DurableObject<Env> {
             let seatIndex = 0
             while (usedSeats.has(seatIndex)) seatIndex++
 
+            // 分配不重复的颜色
+            const usedColors = new Set(
+              Array.from(this.state.players.values()).map((p) => p.color),
+            )
+            let assignedColor = color
+            if (usedColors.has(assignedColor)) {
+              for (let c = 0; c < 8; c++) {
+                if (!usedColors.has(c)) { assignedColor = c; break }
+              }
+            }
+
             // 随机粑粑道具
             const initialPoop =
               GAME_CONSTANTS.SEAT_POOP_MIN +
@@ -146,13 +159,14 @@ export class GameRoom extends DurableObject<Env> {
             this.state.players.set(playerId, {
               id: playerId,
               name,
-              color,
+              color: assignedColor,
               score: 0,
               isReady: false,
               isConnected: true,
-              poopCount: initialPoop,
+              poopCount: isAdmin ? GAME_CONSTANTS.ADMIN_POOP_COUNT : initialPoop,
               seatIndex,
               lastDisconnect: null,
+              isAdmin,
             })
             if (this.state.players.size === 1) {
               this.state.hostId = playerId
@@ -449,10 +463,12 @@ export class GameRoom extends DurableObject<Env> {
     const s = this.state!
     const thrower = s.players.get(pid)
     const target = s.players.get(targetId)
-    if (!thrower || !target || thrower.poopCount <= 0) return
+    if (!thrower || !target || (!thrower.isAdmin && thrower.poopCount <= 0)) return
     if (pid === targetId) return
 
-    thrower.poopCount -= 1
+    if (!thrower.isAdmin) {
+      thrower.poopCount -= 1
+    }
     await this.saveState()
 
     this.broadcast({
@@ -657,7 +673,7 @@ export class GameRoom extends DurableObject<Env> {
     for (const p of s.players.values()) {
       p.score = 0
       p.isReady = false
-      p.poopCount =
+      p.poopCount = p.isAdmin ? GAME_CONSTANTS.ADMIN_POOP_COUNT :
         GAME_CONSTANTS.SEAT_POOP_MIN +
         Math.floor(Math.random() * (GAME_CONSTANTS.SEAT_POOP_MAX - GAME_CONSTANTS.SEAT_POOP_MIN + 1))
     }

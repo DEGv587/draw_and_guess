@@ -58,6 +58,7 @@ export interface Player {
   isConnected: boolean
   poopCount: number
   seatIndex: number
+  isAdmin?: boolean
 }
 
 export interface PlayerScore {
@@ -116,4 +117,5 @@ export interface PlayerState {
   poopCount: number
   seatIndex: number
   lastDisconnect: number | null
+  isAdmin?: boolean
 }

@@ -5,6 +5,7 @@ interface AuthUser {
   id: string
   username: string
   nickname: string
+  isAdmin?: boolean
 }
 
 interface PlayerStore {
@@ -27,7 +28,7 @@ export const usePlayerStore = create<PlayerStore>((set) => {
   return {
     playerId: getOrCreatePlayerId(),
     nickname: saved.authUser?.nickname ?? saved.nickname ?? '',
-    colorIndex: saved.colorIndex ?? 0,
+    colorIndex: saved.colorIndex ?? Math.floor(Math.random() * 8),
     authToken: saved.authToken ?? null,
     authUser: saved.authUser ?? null,
 

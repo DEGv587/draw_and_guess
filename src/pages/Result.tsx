@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { PixelPlayerSeat, PixelCrown, PixelPoop } from '../components/ui/PixelSprite'
 import { ToiletScene, ConfettiBackground, PixelPanel } from '../components/ui/PixelScene'
@@ -5,12 +6,76 @@ import type { PlayerScore } from '@shared/types'
 
 const FALLBACK_RANKINGS: PlayerScore[] = []
 
+/** 砸中时的溅射粒子 */
+function PoopSplash({ active, pKey }: { active: boolean; pKey: number }) {
+  if (!active) return null
+  const particles = ['💩', '💩', '💥', '💩', '✨']
+  return (
+    <div key={pKey} className="absolute inset-0 pointer-events-none z-30">
+      {particles.map((p, i) => (
+        <span
+          key={i}
+          className={`absolute left-1/2 top-1/2 text-lg poop-splat-particle poop-particle-${i + 1}`}
+        >
+          {p}
+        </span>
+      ))}
+    </div>
+  )
+}
+
+/** 可被粑粑砸中的玩家容器 */
+function PoopTarget({
+  playerId,
+  isHit,
+  poopKey,
+  poopScale,
+  onThrow,
+  onAnimEnd,
+  children,
+}: {
+  playerId: string
+  isHit: boolean
+  poopKey: number
+  poopScale: number
+  onThrow: (id: string) => void
+  onAnimEnd: () => void
+  children: React.ReactNode
+}) {
+  return (
+    <div className="relative cursor-pointer" onClick={() => onThrow(playerId)}>
+      {isHit && (
+        <div
+          key={poopKey}
+          className="absolute left-1/2 -translate-x-1/2 z-20 pointer-events-none animate-poop-throw"
+          onAnimationEnd={onAnimEnd}
+        >
+          <PixelPoop scale={poopScale} />
+        </div>
+      )}
+      <PoopSplash active={isHit} pKey={poopKey} />
+      <div key={isHit ? poopKey : 'idle'} className={isHit ? 'animate-poop-hit-flash animate-poop-hit-shake' : ''}>
+        {children}
+      </div>
+    </div>
+  )
+}
+
 export default function Result() {
   const navigate = useNavigate()
   const location = useLocation()
   const routeState = (location.state ?? {}) as { rankings?: PlayerScore[]; roomId?: string }
   const rankings = routeState.rankings ?? FALLBACK_RANKINGS
   const roomId = routeState.roomId
+
+  // 粑粑投掷状态：key 递增强制重新触发动画
+  const [poopTarget, setPoopTarget] = useState<{ id: string; key: number } | null>(null)
+
+  const throwPoop = (targetId: string) => {
+    setPoopTarget((prev) => ({ id: targetId, key: (prev?.key ?? 0) + 1 }))
+  }
+
+  const isHit = (id: string) => poopTarget?.id === id
 
   if (rankings.length === 0) {
     return (
@@ -47,13 +112,23 @@ export default function Result() {
           {/* 第二名 */}
           {second && (
             <div className="flex flex-col items-center">
-              <PixelPlayerSeat
-                name={second.player.name}
-                score={second.totalScore}
-                colorIndex={second.player.color}
-                variant="front"
-                scale={3}
-              />
+              <PoopTarget
+                playerId={second.player.id}
+                isHit={isHit(second.player.id)}
+                poopKey={poopTarget?.key ?? 0}
+                poopScale={2}
+                onThrow={throwPoop}
+                onAnimEnd={() => setPoopTarget(null)}
+              >
+                <PixelPlayerSeat
+                  name={second.player.name}
+                  score={second.totalScore}
+                  colorIndex={second.player.color}
+                  variant="front"
+                  shocked={isHit(second.player.id)}
+                  scale={3}
+                />
+              </PoopTarget>
               <div
                 className="w-24 h-16 mt-2 flex items-center justify-center"
                 style={{
@@ -71,14 +146,24 @@ export default function Result() {
             <div className="animate-float mb-1">
               <PixelCrown scale={4} />
             </div>
-            <PixelPlayerSeat
-              name={first.player.name}
-              score={first.totalScore}
-              colorIndex={first.player.color}
-              variant="front"
-              gold
-              scale={4}
-            />
+            <PoopTarget
+                playerId={first.player.id}
+                isHit={isHit(first.player.id)}
+                poopKey={poopTarget?.key ?? 0}
+                poopScale={3}
+                onThrow={throwPoop}
+                onAnimEnd={() => setPoopTarget(null)}
+              >
+                <PixelPlayerSeat
+                  name={first.player.name}
+                  score={first.totalScore}
+                  colorIndex={first.player.color}
+                  variant="front"
+                  shocked={isHit(first.player.id)}
+                  gold
+                  scale={4}
+                />
+              </PoopTarget>
             <div
               className="w-28 h-24 mt-2 flex items-center justify-center"
               style={{
@@ -93,13 +178,23 @@ export default function Result() {
           {/* 第三名 */}
           {third && (
             <div className="flex flex-col items-center">
-              <PixelPlayerSeat
-                name={third.player.name}
-                score={third.totalScore}
-                colorIndex={third.player.color}
-                variant="front"
-                scale={3}
-              />
+              <PoopTarget
+                playerId={third.player.id}
+                isHit={isHit(third.player.id)}
+                poopKey={poopTarget?.key ?? 0}
+                poopScale={2}
+                onThrow={throwPoop}
+                onAnimEnd={() => setPoopTarget(null)}
+              >
+                <PixelPlayerSeat
+                  name={third.player.name}
+                  score={third.totalScore}
+                  colorIndex={third.player.color}
+                  variant="front"
+                  shocked={isHit(third.player.id)}
+                  scale={3}
+                />
+              </PoopTarget>
               <div
                 className="w-24 h-12 mt-2 flex items-center justify-center"
                 style={{
@@ -117,9 +212,22 @@ export default function Result() {
         {rest.length > 0 && (
           <PixelPanel className="flex gap-6 mb-8 !py-3">
             {rest.map((r) => (
-              <div key={r.player.id} className="flex items-center gap-2">
-                <span className="font-pixel text-xs text-pixel-tile/60">{r.rank}.</span>
-                <span className="text-xs text-pixel-tile">{r.player.name}</span>
+              <div
+                key={r.player.id}
+                className="flex items-center gap-2 cursor-pointer hover:scale-110 transition-transform relative"
+                onClick={() => throwPoop(r.player.id)}
+              >
+                {isHit(r.player.id) && (
+                  <div
+                    key={poopTarget!.key}
+                    className="absolute left-1/2 -translate-x-1/2 -top-6 z-20 pointer-events-none animate-poop-throw"
+                    onAnimationEnd={() => setPoopTarget(null)}
+                  >
+                    <PixelPoop scale={1.5} />
+                  </div>
+                )}
+                <span key={`rank-${isHit(r.player.id) ? poopTarget!.key : 'idle'}`} className={`font-pixel text-xs text-pixel-tile/60 ${isHit(r.player.id) ? 'animate-poop-hit-flash animate-poop-hit-shake' : ''}`}>{r.rank}.</span>
+                <span key={`name-${isHit(r.player.id) ? poopTarget!.key : 'idle'}`} className={`text-xs text-pixel-tile ${isHit(r.player.id) ? 'animate-poop-hit-flash animate-poop-hit-shake' : ''}`}>{r.player.name}</span>
                 <span className="font-pixel text-[10px] text-pixel-yellow">{r.totalScore}</span>
               </div>
             ))}
