@@ -5,7 +5,6 @@ import { ToiletScene, PixelPanel } from '../components/ui/PixelScene'
 import CreateRoomModal, { type RoomConfig } from '../components/Lobby/CreateRoomModal'
 import { usePlayerStore } from '../stores/playerStore'
 import { api } from '../utils/api'
-import { GAME_CONSTANTS } from '@shared/constants'
 
 interface RoomSummary {
   roomId: string
@@ -99,19 +98,6 @@ export default function Home() {
     } catch {
       alert('房间不存在')
     }
-  }
-
-  const handleCreateWithCode = () => {
-    const code = roomCode.trim().toUpperCase()
-    if (!code) { alert('请输入房间号'); return }
-    if (!/^[A-Z0-9]{1,5}$/.test(code)) { alert('房间号仅支持数字和英文，最多5位'); return }
-    handleCreateRoom({
-      seats: GAME_CONSTANTS.DEFAULT_SEATS,
-      rounds: GAME_CONSTANTS.DEFAULT_ROUNDS,
-      drawTime: GAME_CONSTANTS.DEFAULT_DRAW_TIME,
-      wordMode: 'random',
-      customWords: '',
-    })
   }
 
   const handleDoorClick = (room: RoomSummary) => {
@@ -269,9 +255,6 @@ export default function Home() {
               />
               <button onClick={handleJoinRoom} className="pixel-btn text-sm">
                 加入
-              </button>
-              <button onClick={handleCreateWithCode} className="pixel-btn pixel-btn-primary text-sm">
-                创建
               </button>
             </div>
 
